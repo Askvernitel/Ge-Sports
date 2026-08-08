@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+body{margin:0;}
+::selection{background:#3E7CA3;color:#171310;}
+a{color:#3E7CA3;}
+a:hover{color:#E0D6C2;}
+</style>
+<script src="./image-slot.js"></script>
+</helmet>
+<div style="min-height:100vh;background-color:#171310;color:#E0D6C2;font-family:'IBM Plex Sans',sans-serif;display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));">
+
+  <div style="padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between;background-image:repeating-linear-gradient(0deg, transparent 0 38px, rgba(216,211,196,0.03) 38px 39px), repeating-linear-gradient(90deg, transparent 0 38px, rgba(216,211,196,0.03) 38px 39px);">
+    <a href="01 Home.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;color:#A2957A;text-decoration:none;">PUBG WAGER</a>
+
+    <div style="max-width:420px;padding:48px 0;">
+      <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:56px;letter-spacing:1px;text-transform:uppercase;line-height:0.95;margin-bottom:16px;">Sign in</div>
+      <div style="font-size:16px;line-height:1.6;color:#E0D6C2;margin-bottom:36px;text-wrap:pretty;">Connect a Phantom wallet and link the PUBG name you play under. Both are needed before you can join a room.</div>
+
+      <div style="border:1px solid #A2957A;background:#221D17;padding:24px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <div>
+            <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;text-transform:uppercase;">Wallet</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#A2957A;margin-top:6px;">Phantom · Solana devnet</div>
+          </div>
+          <button style="background:#3E7CA3;border:none;color:#171310;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;padding:12px 20px;cursor:pointer;">Connect</button>
+        </div>
+      </div>
+
+      <div style="border:1px solid #A2957A;background:#221D17;padding:24px;">
+        <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;">PUBG name</div>
+        <input type="text" placeholder="In-game name" style="width:100%;background:#171310;border:1px solid #A2957A;color:#E0D6C2;font-family:'IBM Plex Mono',monospace;font-size:15px;padding:12px;box-sizing:border-box;" />
+        <div style="font-size:13px;color:#A2957A;margin-top:12px;line-height:1.5;">Case sensitive. Match results are read against this name.</div>
+      </div>
+
+      <a href="03 Rooms.dc.html" style="display:block;margin-top:24px;background:#3E7CA3;color:#171310;font-size:14px;font-weight:600;text-decoration:none;padding:14px 24px;">Continue</a>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#A2957A;margin-top:24px;letter-spacing:1px;line-height:1.6;">18+ ONLY · DEVNET TOKENS HAVE NO MONETARY VALUE</div>
+    </div>
+
+    <div style="font-size:13px;color:#A2957A;">Identity verification is required once, before your first withdrawal. <a href="08 Identity Verification.dc.html">What that involves</a>.</div>
+  </div>
+
+  <div style="position:relative;min-height:420px;overflow:hidden;border-left:1px solid #A2957A;">
+    <image-slot id="login-terrain" shape="rect" src="assets/lobby-terrain.png" style="width:100%;height:100%;position:absolute;inset:0;" placeholder="Drop a map image"></image-slot>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(23,19,16,0.35) 0%, rgba(23,19,16,0.8) 100%);pointer-events:none;"></div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

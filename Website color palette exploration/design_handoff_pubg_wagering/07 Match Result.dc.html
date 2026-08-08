@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+body{margin:0;}
+::selection{background:#3E7CA3;color:#171310;}
+a{color:#3E7CA3;}
+a:hover{color:#E0D6C2;}
+</style>
+</helmet>
+<div style="min-height:100vh;background-color:#171310;background-image:repeating-linear-gradient(0deg, transparent 0 38px, rgba(216,211,196,0.03) 38px 39px), repeating-linear-gradient(90deg, transparent 0 38px, rgba(216,211,196,0.03) 38px 39px);color:#E0D6C2;font-family:'IBM Plex Sans',sans-serif;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 40px;border-bottom:1px solid #A2957A;">
+    <a href="01 Home.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;color:#A2957A;text-decoration:none;">PUBG WAGER</a>
+    <div style="display:flex;align-items:center;gap:24px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">AVAILABLE</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-variant-numeric:tabular-nums;color:#E0D6C2;">1,240</span>
+      </div>
+      <a href="05 Profile.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;border:1px solid #A2957A;padding:6px 12px 6px 6px;">
+        <span style="width:26px;height:26px;background:#3E7CA3;color:#171310;font-family:'IBM Plex Mono',monospace;font-size:12px;display:flex;align-items:center;justify-content:center;">YR</span>
+        <span style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#E0D6C2;">YouRC</span>
+      </a>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:0;border-bottom:1px solid #A2957A;padding:0 40px;overflow-x:auto;">
+    <a href="01 Home.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">HOME</a>
+    <a href="03 Rooms.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">ROOMS</a>
+    <a href="04 Room Lobby.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">ROOM LOBBY</a>
+    <a href="07 Match Result.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#E0D6C2;border-bottom:2px solid #3E7CA3;">MATCH RESULT</a>
+    <a href="05 Profile.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">PROFILE</a>
+  </div>
+
+  <div style="padding:32px 24px 8px;">
+    <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:44px;letter-spacing:1px;text-transform:uppercase;line-height:1;">Match result — KX-4471</div>
+    <div style="font-size:16px;color:#A2957A;margin-top:6px;">SQUAD · ERANGEL · Settled 08:47</div>
+  </div>
+
+  <div style="margin:24px;">
+    <div style="display:grid;grid-template-columns:60px 1fr 90px 90px 110px;padding:0 16px 10px;border-bottom:1px solid #A2957A;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">RANK</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">PLAYER</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">KILLS</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">POINTS</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">PAYOUT</span>
+    </div>
+    <sc-for list="{{ rows }}" as="row" hint-placeholder-count="6">
+      <div style="display:grid;grid-template-columns:60px 1fr 90px 90px 110px;align-items:center;padding:14px 16px;background:#221D17;margin-top:2px;">
+        <span style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;">{{ row.rank }}</span>
+        <span style="font-size:14px;">{{ row.player }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;">{{ row.kills }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#A2957A;">{{ row.points }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-variant-numeric:tabular-nums;">{{ row.payout }}</span>
+      </div>
+    </sc-for>
+
+    <div style="display:flex;justify-content:flex-end;gap:32px;padding:20px 16px;margin-top:8px;border-top:1px solid #A2957A;font-family:'IBM Plex Mono',monospace;font-size:14px;">
+      <span style="color:#A2957A;">Pool 550 − Rake 44 =</span>
+      <span style="font-size:16px;">Distributed 506</span>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const rows = [
+      { rank: 1, player: 'ShroudUA', kills: 6, points: 12, payout: 142 },
+      { rank: 2, player: 'Nyx_Sova', kills: 3, points: 9, payout: 98 },
+      { rank: 3, player: 'Ferox.gg', kills: 2, points: 7, payout: 76 },
+      { rank: 4, player: 'Karpiv91', kills: 4, points: 6, payout: 65 },
+      { rank: 5, player: 'QuietRiot', kills: 1, points: 4, payout: 45 },
+      { rank: 6, player: 'YouRC', kills: 0, points: 3, payout: 31 },
+    ];
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>

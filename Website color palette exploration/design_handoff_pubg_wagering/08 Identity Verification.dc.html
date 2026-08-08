@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+body{margin:0;}
+::selection{background:#3E7CA3;color:#171310;}
+a{color:#3E7CA3;}
+a:hover{color:#E0D6C2;}
+</style>
+</helmet>
+<div style="min-height:100vh;background-color:#171310;background-image:repeating-linear-gradient(0deg, transparent 0 38px, rgba(216,211,196,0.03) 38px 39px), repeating-linear-gradient(90deg, transparent 0 38px, rgba(216,211,196,0.03) 38px 39px);color:#E0D6C2;font-family:'IBM Plex Sans',sans-serif;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 40px;border-bottom:1px solid #A2957A;">
+    <a href="01 Home.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;color:#A2957A;text-decoration:none;">PUBG WAGER</a>
+    <div style="display:flex;align-items:center;gap:24px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;">AVAILABLE</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-variant-numeric:tabular-nums;color:#E0D6C2;">1,240</span>
+      </div>
+      <a href="05 Profile.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;border:1px solid #A2957A;padding:6px 12px 6px 6px;">
+        <span style="width:26px;height:26px;background:#3E7CA3;color:#171310;font-family:'IBM Plex Mono',monospace;font-size:12px;display:flex;align-items:center;justify-content:center;">YR</span>
+        <span style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#E0D6C2;">YouRC</span>
+      </a>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:0;border-bottom:1px solid #A2957A;padding:0 40px;overflow-x:auto;">
+    <a href="01 Home.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">HOME</a>
+    <a href="03 Rooms.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">ROOMS</a>
+    <a href="04 Room Lobby.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">ROOM LOBBY</a>
+    <a href="07 Match Result.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#A2957A;border-bottom:2px solid transparent;">MATCH RESULT</a>
+    <a href="05 Profile.dc.html" style="padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-decoration:none;color:#E0D6C2;border-bottom:2px solid #3E7CA3;">PROFILE</a>
+  </div>
+
+  <div style="padding:32px 24px 8px;max-width:640px;">
+    <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:44px;letter-spacing:1px;text-transform:uppercase;line-height:1;">Identity verification</div>
+    <div style="font-size:16px;color:#A2957A;margin-top:6px;line-height:1.6;">Required once, before your first withdrawal. Takes about five minutes.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;padding:32px 24px;max-width:640px;">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+      <div style="display:flex;align-items:center;flex:1;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="width:28px;height:28px;border:1px solid {{ s.borderColor }};background:{{ s.fill }};display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;color:{{ s.numColor }};">{{ s.n }}</div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;color:#A2957A;margin-top:8px;">{{ s.label }}</span>
+        </div>
+        <sc-if value="{{ s.hasLine }}">
+          <div style="height:1px;background:#A2957A;flex:1;margin:0 12px 22px;"></div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin:0 24px;max-width:640px;border:1px solid #A2957A;background:#221D17;padding:32px;">
+    <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">Step 2 — Government-issued document</div>
+
+    <label style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#A2957A;display:block;margin-bottom:6px;">Document type</label>
+    <select style="width:100%;background:#171310;border:1px solid #A2957A;color:#E0D6C2;font-family:'IBM Plex Sans',sans-serif;font-size:14px;padding:10px;margin-bottom:20px;">
+      <option>Passport</option>
+      <option>Driver's license</option>
+      <option>National ID</option>
+    </select>
+
+    <label style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#A2957A;display:block;margin-bottom:6px;">Document number</label>
+    <input type="text" style="width:100%;background:#171310;border:1px solid #A2957A;color:#E0D6C2;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:10px;margin-bottom:24px;box-sizing:border-box;" />
+
+    <div style="font-size:13px;color:#A2957A;line-height:1.6;margin-bottom:24px;">Used only to confirm you're eligible to hold and withdraw tokens under regional rules. Not shared with other players.</div>
+
+    <div style="display:flex;gap:12px;">
+      <button style="flex:1;background:transparent;border:1px solid #A2957A;color:#E0D6C2;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;padding:12px;cursor:pointer;">Back</button>
+      <button style="flex:1;background:#3E7CA3;border:none;color:#171310;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;padding:12px;cursor:pointer;">Continue</button>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const steps = [
+      { n: 1, label: 'DETAILS', borderColor: '#3E7CA3', fill: '#3E7CA3', numColor: '#171310', hasLine: true },
+      { n: 2, label: 'DOCUMENT', borderColor: '#3E7CA3', fill: 'transparent', numColor: '#3E7CA3', hasLine: true },
+      { n: 3, label: 'REVIEW', borderColor: '#A2957A', fill: 'transparent', numColor: '#A2957A', hasLine: false },
+    ];
+    return { steps };
+  }
+}
+</script>
+</body>
+</html>

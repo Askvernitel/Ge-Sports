@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------
+   Design tokens — exact values from design_handoff_pubg_wagering/README.md
+   Six colors only. Do not add a seventh. Border-radius is 0 everywhere
+   except the zone ring (a true circle).
+--------------------------------------------------------------------- */
+@theme {
+  --color-ground: #171310;
+  --color-panel: #221d17;
+  --color-panel-hover: #282219;
+  --color-bone: #e0d6c2;
+  --color-lichen: #a2957a;
+  --color-flare: #c13b2a;
+  --color-zone: #3e7ca3;
+  --color-row-rule: #221d17;
+
+  --font-display: "Big Shoulders Display", sans-serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius-none: 0;
+
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 26px;
+  --text-3xl: 28px;
+  --text-4xl: 30px;
+  --text-5xl: 44px;
+  --text-6xl: 56px;
+  --text-7xl: 72px;
+  --text-8xl: 88px;
+}
+
+* {
+  border-radius: 0 !important;
+}
+
+/* the one true exception: the zone ring */
+.zone-ring,
+.zone-ring * {
+  border-radius: 50% !important;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--color-ground);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  background-image: repeating-linear-gradient(
+      0deg,
+      transparent 0 38px,
+      rgba(216, 211, 196, 0.03) 38px 39px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 38px,
+      rgba(216, 211, 196, 0.03) 38px 39px
+    );
+}
+
+::selection {
+  background: var(--color-zone);
+  color: var(--color-ground);
+}
+
+/* Layered so utility classes (e.g. text-ground on a Link) win over this
+   default — Tailwind v4 utilities live in @layer utilities, which always
+   loses to unlayered author CSS regardless of source order/specificity. */
+@layer base {
+  a {
+    color: var(--color-zone);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-bone);
+  }
+}
+
+/* Keyboard focus rings in zone color on every interactive element. */
+:focus-visible {
+  outline: 2px solid var(--color-zone);
+  outline-offset: 2px;
+}
+
+input,
+select,
+button,
+textarea {
+  font-family: inherit;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/* Fluid page-content transition + skeleton shimmer. Both fold to nothing
+   under prefers-reduced-motion via the block below.
+   Deliberately animates only `transform`, never `opacity` — content must
+   never depend on an animation completing to become visible (a slow/janky
+   frame pump, e.g. a backgrounded tab or a throttled renderer, would
+   otherwise leave the page looking blank). */
+@keyframes fade-in-up {
+  from {
+    transform: translateY(6px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.page-fade-in {
+  animation: fade-in-up 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-panel) 25%, var(--color-panel-hover) 50%, var(--color-panel) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

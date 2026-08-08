@@ -41,9 +41,11 @@
   border-radius: 0 !important;
 }
 
-/* the one true exception: the zone ring */
+/* The zone ring's exception extends to the click-ping (also a circle,
+   spawned by components/ClickPing.tsx) — everything else stays 0. */
 .zone-ring,
-.zone-ring * {
+.zone-ring *,
+.click-ping {
   border-radius: 50% !important;
 }
 
@@ -68,6 +70,17 @@ body {
       transparent 0 38px,
       rgba(216, 211, 196, 0.03) 38px 39px
     );
+  /* A scope-style crosshair reticle in place of the default arrow — bone,
+     not zone/flare, since those two are reserved for timing/escrow and
+     live/destructive meaning per the design token rules above and must
+     never be used decoratively. Interactive elements still fall back to
+     the browser's pointer/text cursor (their own `cursor-pointer` utility
+     classes are more specific than this body-level rule), so click
+     affordance on buttons/links is unaffected. */
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='12' y1='0' x2='12' y2='5' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='12' y1='19' x2='12' y2='24' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='0' y1='12' x2='5' y2='12' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='19' y1='12' x2='24' y2='12' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Ccircle cx='12' cy='12' r='1' fill='%23E0D6C2'/%3E%3C/svg%3E")
+      12 12,
+    crosshair;
 }
 
 ::selection {
@@ -136,6 +149,33 @@ table {
   background: linear-gradient(90deg, var(--color-panel) 25%, var(--color-panel-hover) 50%, var(--color-panel) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Click feedback — a brief expanding ring at the pointer on every click,
+   spawned/removed by components/ClickPing.tsx. Bone, not zone, for the
+   same reserved-color reason as the cursor above. Skipped entirely under
+   reduced-motion (ClickPing checks usePrefersReducedMotion before ever
+   rendering one, rather than relying on this block to hide it, since an
+   instantly-completed ring would still flash into existence for a frame). */
+@keyframes click-ping {
+  from {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
+.click-ping {
+  position: fixed;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--color-bone);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: click-ping 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

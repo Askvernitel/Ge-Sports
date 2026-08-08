@@ -69,7 +69,13 @@ body {
       90deg,
       transparent 0 38px,
       rgba(216, 211, 196, 0.03) 38px 39px
-    );
+    ),
+    /* Scattered impact marks — a fixed-tile texture, not a UI element, so
+       it stays in neutral bone/black rather than the reserved accent
+       colors. Faint on purpose: felt, not noticed. */
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cg fill='none' stroke='rgba(224,214,194,0.05)' stroke-width='1'%3E%3Ccircle cx='70' cy='90' r='7' fill='rgba(0,0,0,0.35)' stroke='rgba(224,214,194,0.06)'/%3E%3Cpath d='M70 90 L58 78 M70 90 L84 80 M70 90 L76 104 M70 90 L60 100 M70 90 L82 96'/%3E%3Ccircle cx='340' cy='60' r='4' fill='rgba(0,0,0,0.3)' stroke='rgba(224,214,194,0.05)'/%3E%3Cpath d='M340 60 L332 52 M340 60 L349 54 M340 60 L344 69'/%3E%3Ccircle cx='230' cy='260' r='9' fill='rgba(0,0,0,0.4)' stroke='rgba(224,214,194,0.07)'/%3E%3Cpath d='M230 260 L214 248 M230 260 L248 250 M230 260 L238 278 M230 260 L216 272 M230 260 L246 268 M230 260 L222 244'/%3E%3Ccircle cx='450' cy='300' r='5' fill='rgba(0,0,0,0.32)' stroke='rgba(224,214,194,0.05)'/%3E%3Cpath d='M450 300 L441 292 M450 300 L461 296 M450 300 L455 311'/%3E%3Ccircle cx='120' cy='420' r='6' fill='rgba(0,0,0,0.35)' stroke='rgba(224,214,194,0.06)'/%3E%3Cpath d='M120 420 L109 411 M120 420 L133 415 M120 420 L126 432 M120 420 L110 428'/%3E%3Ccircle cx='400' cy='450' r='4' fill='rgba(0,0,0,0.3)' stroke='rgba(224,214,194,0.05)'/%3E%3Cpath d='M400 450 L392 443 M400 450 L409 446 M400 450 L404 459'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: repeat, repeat, repeat;
   /* A scope-style crosshair reticle in place of the default arrow — bone,
      not zone/flare, since those two are reserved for timing/escrow and
      live/destructive meaning per the design token rules above and must
@@ -79,6 +85,23 @@ body {
      affordance on buttons/links is unaffected. */
   cursor:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='12' y1='0' x2='12' y2='5' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='12' y1='19' x2='12' y2='24' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='0' y1='12' x2='5' y2='12' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Cline x1='19' y1='12' x2='24' y2='12' stroke='%23E0D6C2' stroke-width='1.4'/%3E%3Ccircle cx='12' cy='12' r='1' fill='%23E0D6C2'/%3E%3C/svg%3E")
+      12 12,
+    crosshair;
+}
+
+/* Same reticle, flare-colored, over anything clickable — "target acquired"
+   rather than the neutral bone crosshair everywhere else. Unlayered (not
+   @layer utilities) so it beats Tailwind's cursor-pointer utility class
+   without needing !important, same trick as the `a{color}` override below:
+   layered author styles always lose to unlayered ones regardless of
+   source order/specificity. */
+a,
+button,
+[role="button"],
+.cursor-pointer,
+label {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%23C13B2A' stroke-width='1.6'/%3E%3Cline x1='12' y1='0' x2='12' y2='5' stroke='%23C13B2A' stroke-width='1.6'/%3E%3Cline x1='12' y1='19' x2='12' y2='24' stroke='%23C13B2A' stroke-width='1.6'/%3E%3Cline x1='0' y1='12' x2='5' y2='12' stroke='%23C13B2A' stroke-width='1.6'/%3E%3Cline x1='19' y1='12' x2='24' y2='12' stroke='%23C13B2A' stroke-width='1.6'/%3E%3Ccircle cx='12' cy='12' r='1.2' fill='%23C13B2A'/%3E%3C/svg%3E")
       12 12,
     crosshair;
 }

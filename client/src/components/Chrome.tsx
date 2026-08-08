@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
+import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { useSessionStore } from '@/app/store';
 import { logout } from '@/features/auth/api';
 import { formatTokens } from '@/lib/money';
@@ -38,6 +39,7 @@ export function Chrome() {
   const navigate = useNavigate();
   const { data: wallet } = useWalletBalance();
   const { displayName, initials, isAuthenticated } = useSessionStore();
+  const animatedBalance = useAnimatedNumber(wallet?.custodialBalance ?? 0);
 
   async function handleLogout() {
     await logout();
@@ -55,7 +57,7 @@ export function Chrome() {
             <div className="flex items-center gap-2.5 border border-lichen py-1.5 pl-3 pr-3.5">
               <span className="font-mono text-xs tracking-[1px] text-lichen">BALANCE</span>
               <span className="font-mono text-lg tabular-nums text-bone">
-                {wallet ? formatTokens(wallet.custodialBalance) : '—'}
+                {wallet ? formatTokens(animatedBalance) : '—'}
               </span>
             </div>
           )}

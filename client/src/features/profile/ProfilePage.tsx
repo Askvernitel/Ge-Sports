@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletNotReadyError } from '@solana/wallet-adapter-base';
 import { useSessionStore } from '@/app/store';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
+import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { fetchLedger } from '@/features/wallet/api';
 import { fetchMyRooms } from '@/features/rooms/api';
 import { linkPubgName } from '@/features/auth/api';
@@ -25,6 +26,9 @@ export function ProfilePage() {
   const { displayName, initials, publicKey, walletConnected, connectWallet, pubgName, pubgNameLinked, setPubgName } =
     useSessionStore();
   const { data: wallet, isLoading: walletLoading } = useWalletBalance();
+  const animatedOnChain = useAnimatedNumber(wallet?.onChainBalance ?? 0);
+  const animatedAvailable = useAnimatedNumber(wallet?.custodialBalance ?? 0);
+  const animatedLocked = useAnimatedNumber(wallet?.lockedBalance ?? 0);
   const { data: ledger, isLoading: ledgerLoading } = useQuery({ queryKey: ['ledger'], queryFn: fetchLedger });
   const { data: myRooms, isLoading: roomsLoading } = useQuery({ queryKey: ['rooms', 'mine'], queryFn: fetchMyRooms });
   const { data: idVerification } = useQuery({ queryKey: ['kyc', 'status'], queryFn: fetchKycStatus });
@@ -178,7 +182,7 @@ export function ProfilePage() {
           {walletLoading ? (
             <Skeleton className="h-[52px] w-2/3 mt-3.5" />
           ) : (
-            <div className="font-mono text-5xl tabular-nums mt-3.5">{wallet ? formatTokens(wallet.onChainBalance) : '—'}</div>
+            <div className="font-mono text-5xl tabular-nums mt-3.5">{wallet ? formatTokens(animatedOnChain) : '—'}</div>
           )}
           <div className="text-sm text-lichen mt-3 leading-[1.5]">
             Everything held by your connected Phantom wallet on Solana devnet.
@@ -189,7 +193,7 @@ export function ProfilePage() {
           {walletLoading ? (
             <Skeleton className="h-[52px] w-2/3 mt-3.5" />
           ) : (
-            <div className="font-mono text-5xl tabular-nums mt-3.5">{wallet ? formatTokens(wallet.custodialBalance) : '—'}</div>
+            <div className="font-mono text-5xl tabular-nums mt-3.5">{wallet ? formatTokens(animatedAvailable) : '—'}</div>
           )}
           <div className="text-sm text-lichen mt-3 leading-[1.5]">Free to enter a room or withdraw.</div>
         </div>
@@ -198,7 +202,7 @@ export function ProfilePage() {
           {walletLoading ? (
             <Skeleton className="h-[52px] w-2/3 mt-3.5" />
           ) : (
-            <div className="font-mono text-5xl tabular-nums mt-3.5 text-zone">{wallet ? formatTokens(wallet.lockedBalance) : '—'}</div>
+            <div className="font-mono text-5xl tabular-nums mt-3.5 text-zone">{wallet ? formatTokens(animatedLocked) : '—'}</div>
           )}
           <div className="text-sm text-lichen mt-3 leading-[1.5]">
             {(() => {

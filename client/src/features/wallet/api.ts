@@ -101,6 +101,36 @@ export async function claimDeposit(amount: number): Promise<{ ok: true; wallet: 
   return { ok: true as const, wallet: mapWallet(wallet) };
 }
 
+// --- Real on-chain deposit path (server/README.md's "custodial hybrid"
+// model, spec section 4) — needs a configured treasury + SPL mint on the
+// backend, which needs a funded devnet keypair; see
+// server/scripts/setup-devnet-token.sh. Degrades to null when unconfigured
+// so the UI can fall back to the faucet-only path rather than break. ---
+
+export interface DepositInfo {
+  treasuryPublicKey: string | null;
+  mint: string | null;
+}
+
+export async function fetchDepositInfo(): Promise<DepositInfo> {
+  return http.get<DepositInfo>('/wallet/deposit-info');
+}
+
+/** Dev-only: sends real on-chain GESPORTS tokens from the treasury to the
+ * caller's own linked wallet, so there's something to actually deposit. */
+export async function chainFaucet(amount: number): Promise<{ signature: string }> {
+  return http.post<{ signature: string }>('/dev/chain-faucet', { amount: String(amount) });
+}
+
+/** Submits a signature for a deposit transaction the client already built,
+ * signed, and sent on-chain — the backend verifies it independently
+ * (mint/destination/sender/finalized) before crediting the ledger. */
+export async function claimOnChainDeposit(signature: string): Promise<{ wallet: Wallet }> {
+  await http.post('/wallet/deposits/claim', { signature });
+  const wallet = await fetchWallet();
+  return { wallet };
+}
+
 export async function requestWithdrawal(amount: number): Promise<{ ok: true; wallet: Wallet }> {
   const destinationPubkey = useSessionStore.getState().publicKey ?? '';
   await http.post('/wallet/withdrawals', { amount: String(amount), destinationPubkey });

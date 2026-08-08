@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
-import { claimDeposit, requestWithdrawal } from './api';
+import { claimDeposit, chainFaucet, claimOnChainDeposit, fetchDepositInfo, requestWithdrawal } from './api';
+import { sendDepositTransaction } from '@/lib/solanaDeposit';
 import { formatTokens } from '@/lib/money';
 import { ZoneRing } from '@/components/ZoneRing';
 import { useSessionStore } from '@/app/store';
 
-type PendingAction = 'deposit' | 'withdraw' | null;
+type PendingAction = 'deposit' | 'withdraw' | 'chain-faucet' | null;
 
 function truncateKey(key: string): string {
   return key.length > 12 ? `${key.slice(0, 6)}…${key.slice(-4)}` : key;
@@ -15,17 +17,68 @@ function truncateKey(key: string): string {
 
 export function DepositWithdrawPage() {
   const { data: wallet } = useWalletBalance();
+  const { data: depositInfo } = useQuery({ queryKey: ['wallet', 'deposit-info'], queryFn: fetchDepositInfo });
   const { publicKey, walletConnected } = useSessionStore();
+  const solanaWallet = useWallet();
+  const { connection } = useConnection();
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState('100');
   const [pending, setPending] = useState<PendingAction>(null);
   const [progressPct, setProgressPct] = useState(45);
+  const [chainError, setChainError] = useState<string | null>(null);
+
+  const onChainReady = Boolean(depositInfo?.treasuryPublicKey && depositInfo?.mint && walletConnected);
 
   const depositMutation = useMutation({
     mutationFn: (amt: number) => claimDeposit(amt),
     onMutate: () => setPending('deposit'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      setPending(null);
+    },
+    onError: () => setPending(null),
+  });
+
+  // Real path: build + sign + send an actual SPL transfer to the treasury,
+  // then hand the signature to the backend, which independently verifies it
+  // on-chain before crediting the ledger (server/src/chain/txVerify.ts).
+  const onChainDepositMutation = useMutation({
+    mutationFn: async (amt: number) => {
+      if (!depositInfo?.treasuryPublicKey || !depositInfo?.mint) throw new Error('On-chain deposits are not configured yet');
+      const signature = await sendDepositTransaction({
+        connection,
+        wallet: solanaWallet,
+        mint: depositInfo.mint,
+        treasuryPublicKey: depositInfo.treasuryPublicKey,
+        amountWholeTokens: amt,
+      });
+      return claimOnChainDeposit(signature);
+    },
+    onMutate: () => {
+      setChainError(null);
+      setPending('deposit');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      setPending(null);
+    },
+    onError: (err: unknown) => {
+      setChainError(err instanceof Error ? err.message : 'On-chain deposit failed.');
+      setPending(null);
+    },
+  });
+
+  // Dev convenience: mints real GESPORTS into the user's own wallet so
+  // there's something to deposit with the real flow above.
+  const chainFaucetMutation = useMutation({
+    mutationFn: (amt: number) => chainFaucet(amt),
+    onMutate: () => {
+      setChainError(null);
+      setPending('chain-faucet');
+    },
+    onSuccess: () => setPending(null),
+    onError: (err: unknown) => {
+      setChainError(err instanceof Error ? err.message : 'Could not send devnet tokens to your wallet.');
       setPending(null);
     },
   });
@@ -37,10 +90,20 @@ export function DepositWithdrawPage() {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
       setPending(null);
     },
+    onError: () => setPending(null),
   });
 
   const numericAmount = Number(amount) || 0;
-  const isBusy = depositMutation.isPending || withdrawMutation.isPending;
+  const isBusy = depositMutation.isPending || onChainDepositMutation.isPending || withdrawMutation.isPending || chainFaucetMutation.isPending;
+
+  function handleDeposit() {
+    setProgressPct(45);
+    if (onChainReady) {
+      onChainDepositMutation.mutate(numericAmount);
+    } else {
+      depositMutation.mutate(numericAmount);
+    }
+  }
 
   return (
     <div>
@@ -71,6 +134,11 @@ export function DepositWithdrawPage() {
               first.
             </div>
           )}
+          <div className="font-mono text-xs text-lichen mt-3 leading-[1.5]">
+            {onChainReady
+              ? 'On-chain deposits are live — this will build a real GESPORTS transfer you sign in Phantom.'
+              : 'On-chain deposits are not configured on this server yet — deposits use the off-chain devnet faucet instead.'}
+          </div>
 
           <div className="h-px bg-lichen opacity-40 my-5" />
 
@@ -90,10 +158,7 @@ export function DepositWithdrawPage() {
           <div className="flex gap-3 mt-5">
             <button
               disabled={isBusy || numericAmount <= 0}
-              onClick={() => {
-                setProgressPct(45);
-                depositMutation.mutate(numericAmount);
-              }}
+              onClick={handleDeposit}
               className="flex-1 bg-zone border-none text-ground font-sans text-sm font-semibold p-3 cursor-pointer disabled:opacity-50"
             >
               Deposit tokens
@@ -115,6 +180,23 @@ export function DepositWithdrawPage() {
               {formatTokens(wallet.lockedBalance)} is locked in open rooms.
             </div>
           )}
+          {chainError && <div className="text-xs mt-3 leading-[1.5] text-flare">{chainError}</div>}
+
+          {onChainReady && (
+            <>
+              <div className="h-px bg-lichen opacity-40 my-5" />
+              <div className="text-sm text-lichen leading-[1.5] mb-3">
+                Need GESPORTS in your wallet to test a real deposit? Send yourself devnet tokens first.
+              </div>
+              <button
+                disabled={isBusy || numericAmount <= 0}
+                onClick={() => chainFaucetMutation.mutate(numericAmount)}
+                className="w-full bg-transparent border border-lichen text-bone font-sans text-sm font-semibold p-3 cursor-pointer disabled:opacity-50"
+              >
+                {chainFaucetMutation.isPending ? 'Sending…' : 'Send devnet GESPORTS to my wallet'}
+              </button>
+            </>
+          )}
         </div>
 
         <div className="border border-lichen bg-panel p-6 flex flex-col items-center justify-center text-center">
@@ -124,7 +206,7 @@ export function DepositWithdrawPage() {
                 <span className="font-mono text-sm text-zone">{progressPct}%</span>
               </ZoneRing>
               <div className="font-display font-bold text-md tracking-[1px] uppercase">
-                Confirming {pending === 'deposit' ? 'deposit' : 'withdrawal'}
+                {pending === 'chain-faucet' ? 'Sending devnet tokens' : `Confirming ${pending === 'deposit' ? 'deposit' : 'withdrawal'}`}
               </div>
               <div className="text-sm text-lichen mt-2 leading-[1.5]">
                 Waiting on Solana devnet confirmation. This usually takes under a minute.

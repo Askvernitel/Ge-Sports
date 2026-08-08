@@ -27,3 +27,4 @@ walletRoutes.post(
   asyncHandler(walletController.requestWithdrawal),
 );
 walletRoutes.get('/withdrawals/:id', asyncHandler(walletController.getWithdrawal));
+walletRoutes.get('/deposit-info', asyncHandler(walletController.getDepositInfo));

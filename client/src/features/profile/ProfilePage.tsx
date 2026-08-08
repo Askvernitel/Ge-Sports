@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { WalletNotReadyError } from '@solana/wallet-adapter-base';
 import { useSessionStore } from '@/app/store';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
 import { fetchLedger } from '@/features/wallet/api';
-import { fetchLimits, updateLimits, setSelfExclusion } from '@/features/wallet/api';
 import { fetchMyRooms } from '@/features/rooms/api';
 import { linkPubgName } from '@/features/auth/api';
 import { fetchKycStatus } from '@/features/kyc/api';
@@ -28,19 +27,7 @@ export function ProfilePage() {
   const { data: wallet, isLoading: walletLoading } = useWalletBalance();
   const { data: ledger, isLoading: ledgerLoading } = useQuery({ queryKey: ['ledger'], queryFn: fetchLedger });
   const { data: myRooms, isLoading: roomsLoading } = useQuery({ queryKey: ['rooms', 'mine'], queryFn: fetchMyRooms });
-  const { data: limits } = useQuery({ queryKey: ['limits'], queryFn: fetchLimits });
   const { data: idVerification } = useQuery({ queryKey: ['kyc', 'status'], queryFn: fetchKycStatus });
-  const queryClient = useQueryClient();
-
-  const toggleReminder = useMutation({
-    mutationFn: () => updateLimits({ sessionReminderEnabled: !limits?.sessionReminderEnabled }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['limits'] }),
-  });
-
-  const excludeMutation = useMutation({
-    mutationFn: () => setSelfExclusion(30),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['limits'] }),
-  });
 
   const solanaWallet = useWallet();
   const [connecting, setConnecting] = useState(false);
@@ -48,19 +35,45 @@ export function ProfilePage() {
   const [nameInput, setNameInput] = useState(pubgName ?? '');
   const [linking, setLinking] = useState(false);
 
-  async function handleConnectWallet() {
+  // wallet-adapter-react's `select()` updates `wallet.wallet` (the chosen
+  // adapter) through React state, so calling `connect()` in the same
+  // synchronous handler right after `select()` still sees the OLD adapter
+  // reference from this render's closure and throws — which the previous
+  // implementation caught and silently swapped in a fake pubkey, making
+  // Phantom look broken even when it was installed and working fine. The
+  // fix: select, then let this effect fire `connect()` once the adapter
+  // context has actually updated to the newly selected one.
+  const pendingConnect = useRef(false);
+  useEffect(() => {
+    if (!pendingConnect.current || !solanaWallet.wallet) return;
+    pendingConnect.current = false;
+    solanaWallet
+      .connect()
+      .then(() => {
+        if (solanaWallet.publicKey) connectWallet(solanaWallet.publicKey.toBase58());
+      })
+      .catch((err: unknown) => {
+        if (err instanceof WalletNotReadyError) {
+          setConnectError('Phantom extension not found. Install it from phantom.app, then try again.');
+        } else {
+          setConnectError(err instanceof Error ? err.message : 'Could not connect to Phantom.');
+        }
+      })
+      .finally(() => setConnecting(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [solanaWallet.wallet]);
+
+  function handleConnectWallet() {
     setConnectError(null);
     setConnecting(true);
-    try {
-      solanaWallet.select(new PhantomWalletAdapter().name);
-      await solanaWallet.connect();
-      if (solanaWallet.publicKey) connectWallet(solanaWallet.publicKey.toBase58());
-    } catch {
-      connectWallet('7xKp…9mQ2 (mock)');
-      setConnectError('Phantom not detected. Using a mock devnet connection for preview.');
-    } finally {
+    const phantom = solanaWallet.wallets.find((w) => w.adapter.name.toLowerCase().includes('phantom'));
+    if (!phantom) {
       setConnecting(false);
+      setConnectError('Phantom extension not found. Install it from phantom.app, then try again.');
+      return;
     }
+    pendingConnect.current = true;
+    solanaWallet.select(phantom.adapter.name);
   }
 
   async function handleLinkPubgName() {
@@ -87,7 +100,7 @@ export function ProfilePage() {
               {displayName}
             </div>
             <div className="font-mono text-sm text-lichen mt-2">
-              EU · {pubgNameLinked ? 'PUBG NAME LINKED' : 'PUBG NAME NOT LINKED'} · {publicKey ?? 'WALLET NOT CONNECTED'}
+              {pubgNameLinked ? 'PUBG NAME LINKED' : 'PUBG NAME NOT LINKED'} · {publicKey ?? 'WALLET NOT CONNECTED'}
             </div>
           </div>
         </div>
@@ -265,89 +278,29 @@ export function ProfilePage() {
         </div>
       </div>
 
-      {/* Recent activity + limits */}
-      <div className="flex flex-wrap gap-10 px-10 pt-14 pb-[72px] items-start">
-        <div style={{ flex: '1 1 420px', minWidth: 0 }}>
-          <div className="font-display font-bold text-md tracking-[2px] uppercase mb-5">Recent activity</div>
-          {ledgerLoading &&
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[52px] w-full mb-0.5" />)}
-          {!ledgerLoading && (ledger ?? []).length === 0 && <div className="text-lichen text-md">No activity yet.</div>}
-          {(ledger ?? []).map((entry) => (
-            <div
-              key={entry.id}
-              className="grid items-center gap-3 px-5 py-3.5 bg-panel mb-0.5"
-              style={{ gridTemplateColumns: 'minmax(90px,120px) minmax(0,1fr) 90px 100px' }}
+      {/* Recent activity */}
+      <div className="px-10 pt-14 pb-[72px]">
+        <div className="font-display font-bold text-md tracking-[2px] uppercase mb-5">Recent activity</div>
+        {ledgerLoading &&
+          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[52px] w-full mb-0.5" />)}
+        {!ledgerLoading && (ledger ?? []).length === 0 && <div className="text-lichen text-md">No activity yet.</div>}
+        {(ledger ?? []).map((entry) => (
+          <div
+            key={entry.id}
+            className="grid items-center gap-3 px-5 py-3.5 bg-panel mb-0.5"
+            style={{ gridTemplateColumns: 'minmax(90px,120px) minmax(0,1fr) 90px 100px' }}
+          >
+            <span className="font-mono text-sm text-lichen">{entry.createdAt}</span>
+            <span className="text-base">{entry.description}</span>
+            <span
+              className="font-mono text-base tabular-nums"
+              style={{ color: entry.status === 'ESCROWED' ? tokens.zone : tokens.bone }}
             >
-              <span className="font-mono text-sm text-lichen">{entry.createdAt}</span>
-              <span className="text-base">{entry.description}</span>
-              <span
-                className="font-mono text-base tabular-nums"
-                style={{ color: entry.status === 'ESCROWED' ? tokens.zone : tokens.bone }}
-              >
-                {formatSigned(entry.amount)}
-              </span>
-              <span className="font-mono text-xs text-lichen">{entry.status}</span>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ flex: '0 1 340px', boxSizing: 'border-box' }}>
-          <div className="font-display font-bold text-md tracking-[2px] uppercase mb-5">Limits</div>
-
-          <div className="border border-lichen bg-panel p-6 mb-0.5">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-base">Deposit limit, per day</span>
-              <span className="font-mono text-md tabular-nums">{limits ? formatTokens(limits.depositLimitPerDay) : '—'}</span>
-            </div>
+              {formatSigned(entry.amount)}
+            </span>
+            <span className="font-mono text-xs text-lichen">{entry.status}</span>
           </div>
-
-          <div className="border border-lichen bg-panel p-6 mb-0.5">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-base">Session reminder after {limits?.sessionReminderMinutes ?? 60} minutes</span>
-              <button
-                onClick={() => toggleReminder.mutate()}
-                aria-pressed={limits?.sessionReminderEnabled}
-                className="w-10 h-[22px] relative flex-shrink-0 cursor-pointer p-0"
-                style={{
-                  border: `1px solid ${tokens.zone}`,
-                  background: limits?.sessionReminderEnabled ? tokens.zone : 'transparent',
-                }}
-              >
-                <div
-                  className="w-4 h-4 absolute top-[2px]"
-                  style={{
-                    background: limits?.sessionReminderEnabled ? tokens.ground : tokens.lichen,
-                    right: limits?.sessionReminderEnabled ? 2 : undefined,
-                    left: limits?.sessionReminderEnabled ? undefined : 2,
-                  }}
-                />
-              </button>
-            </div>
-          </div>
-
-          <div className="p-6" style={{ border: `1px solid ${tokens.flare}`, background: tokens.panel }}>
-            <div className="font-display font-bold text-sm tracking-[2px] uppercase mb-3" style={{ color: tokens.flare }}>
-              Self-exclusion
-            </div>
-            <div className="text-sm text-lichen leading-[1.6] mb-4">
-              Blocks deposits and room entry for a period you choose. Cannot be reversed early once started.
-            </div>
-            {limits?.selfExclusionActive ? (
-              <div className="font-mono text-sm" style={{ color: tokens.flare }}>
-                Active until {limits.selfExclusionUntil ? new Date(limits.selfExclusionUntil).toLocaleDateString() : '—'}
-              </div>
-            ) : (
-              <button
-                onClick={() => excludeMutation.mutate()}
-                disabled={excludeMutation.isPending}
-                className="bg-transparent text-sm font-semibold px-[18px] py-2.5 cursor-pointer"
-                style={{ border: `1px solid ${tokens.flare}`, color: tokens.flare }}
-              >
-                {excludeMutation.isPending ? 'Setting…' : 'Set self-exclusion'}
-              </button>
-            )}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -6,3 +6,6 @@ build/
 CLAUDE.local.md
 *.log
 .DS_Store
+.secrets/
+images/
+client/src/assets/maps/auth-hero-local.*

@@ -1,21 +1,24 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchRooms, MODES, REGIONS } from './api';
+import { fetchRooms, MODES } from './api';
 import { RoomCard } from './RoomCard';
 import { RoomCardSkeleton } from '@/components/Skeleton';
 import { legendTerrainSrc } from '@/lib/mapAssets';
-import type { Region, RoomMode } from '@/lib/types';
+import type { RoomMode } from '@/lib/types';
 import { tokens } from '@/lib/tokens';
 
-// Filter state lives in the URL search params (region, modes[], feeMin,
-// feeMax, openOnly, joinedOnly) so a filtered browse is shareable and
-// survives reload — per design README "Interactions & Behavior".
+// Filter state lives in the URL search params (modes[], feeMin, feeMax,
+// openOnly, joinedOnly) so a filtered browse is shareable and survives
+// reload — per design README "Interactions & Behavior". Region-based
+// filtering was removed from the UI (rooms are no longer divided by
+// region here); the backend still accepts a region query param and the
+// Room model still carries config.region, this just stops filtering/
+// displaying by it.
 
 function useRoomFilters() {
   const [params, setParams] = useSearchParams();
 
-  const region = (params.get('region') as Region | null) ?? 'EU';
   const modes = (params.get('modes')?.split(',').filter(Boolean) as RoomMode[]) ?? [];
   const feeMin = Number(params.get('feeMin') ?? 10);
   const feeMax = Number(params.get('feeMax') ?? 200);
@@ -31,17 +34,16 @@ function useRoomFilters() {
     setParams(next, { replace: true });
   }
 
-  return { region, modes, feeMin, feeMax, openOnly, joinedOnly, update };
+  return { modes, feeMin, feeMax, openOnly, joinedOnly, update };
 }
 
 export function RoomsPage() {
   const filters = useRoomFilters();
 
   const { data: rooms, isLoading } = useQuery({
-    queryKey: ['rooms', filters.region, filters.modes, filters.feeMin, filters.feeMax, filters.openOnly, filters.joinedOnly],
+    queryKey: ['rooms', filters.modes, filters.feeMin, filters.feeMax, filters.openOnly, filters.joinedOnly],
     queryFn: () =>
       fetchRooms({
-        region: filters.region,
         modes: filters.modes,
         feeMin: filters.feeMin,
         feeMax: filters.feeMax,
@@ -60,28 +62,10 @@ export function RoomsPage() {
 
   return (
     <div>
-      {/* Compass strip — region filter, doubles as tick-mark nav */}
-      <div className="flex items-stretch border-b border-lichen h-[52px] px-10 overflow-x-auto">
-        {REGIONS.map((r) => (
-          <button
-            key={r}
-            onClick={() => filters.update({ region: r })}
-            className="flex items-center h-full px-6 border-l border-lichen bg-transparent border-t-0 border-b-0 border-r-0 cursor-pointer"
-          >
-            <span
-              className="font-mono text-sm tracking-[1px]"
-              style={{ color: filters.region === r ? tokens.zone : tokens.lichen }}
-            >
-              {r}
-            </span>
-          </button>
-        ))}
-      </div>
-
       <div className="px-10 pt-12 pb-2">
         <h1 className="font-display font-black text-6xl tracking-[1px] uppercase leading-none">Rooms</h1>
         <div className="text-md text-lichen mt-2">
-          {filters.region} · {openCount} open · {liveCount} live
+          {openCount} open · {liveCount} live
         </div>
       </div>
 
@@ -148,15 +132,14 @@ export function RoomsPage() {
 
           <div className="h-px bg-lichen opacity-40 my-7" />
 
-          <div className="font-display font-bold text-sm tracking-[2px] uppercase text-lichen mb-3.5">EU sector</div>
-          <img src={legendTerrainSrc} alt="Region map" className="w-full h-[150px] object-cover" />
+          <img src={legendTerrainSrc} alt="" className="w-full h-[150px] object-cover" />
         </div>
 
         {/* Room grid */}
         <div style={{ flex: '1 1 520px', minWidth: 0 }}>
           {!isLoading && (rooms ?? []).length === 0 && (
             <div className="text-lichen text-md">
-              No rooms match these filters. Widen the fee range or clear the region.
+              No rooms match these filters. Widen the fee range or clear a filter.
             </div>
           )}
           <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px,1fr))' }}>

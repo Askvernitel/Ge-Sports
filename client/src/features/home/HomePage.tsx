@@ -145,10 +145,6 @@ export function HomePage() {
           </div>
         ))}
       </div>
-
-      <div className="border-t border-lichen px-10 py-8 font-mono text-xs text-lichen tracking-[1px]">
-        DEVNET BUILD · TEST TOKENS HAVE NO MONETARY VALUE
-      </div>
     </div>
   );
 }

@@ -20,8 +20,8 @@ export function IdentityVerificationPage() {
   });
 
   return (
-    <div>
-      <div className="px-6 pt-8 pb-2" style={{ maxWidth: 640 }}>
+    <div className="mx-auto px-10 pt-8 pb-16" style={{ maxWidth: 640 }}>
+      <div className="pb-2">
         <h1 className="font-display font-black text-5xl tracking-[1px] uppercase leading-none">
           Identity verification
         </h1>
@@ -30,7 +30,7 @@ export function IdentityVerificationPage() {
         </p>
       </div>
 
-      <div className="flex items-center px-6 py-8" style={{ maxWidth: 640 }}>
+      <div className="flex items-center py-8">
         {STEP_LABELS.map((label, i) => {
           const n = i + 1;
           const state = submitted || n < currentStep ? 'done' : n === currentStep ? 'current' : 'upcoming';
@@ -54,7 +54,7 @@ export function IdentityVerificationPage() {
         })}
       </div>
 
-      <div className="mx-6 border border-lichen bg-panel p-8" style={{ maxWidth: 640 }}>
+      <div className="border border-lichen bg-panel p-8">
         {submitted ? (
           <>
             <div className="font-display font-bold text-md tracking-[1px] uppercase mb-3" style={{ color: tokens.zone }}>

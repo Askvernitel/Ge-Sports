@@ -3,15 +3,27 @@ import { useWalletBalance } from '@/hooks/useWalletBalance';
 import { useSessionStore } from '@/app/store';
 import { logout } from '@/features/auth/api';
 import { formatTokens } from '@/lib/money';
+import { tokens } from '@/lib/tokens';
 import { Logo } from './Logo';
 
 // Room Lobby, Match Result and Profile are reached in context (from a room
 // card, a settled match, or the profile chip) rather than as static nav
 // destinations — there's no single "the" lobby or "the" result to point a
-// fixed link at, and profile already has its own entry point up top.
-const NAV_TABS = [
+// fixed link at, and profile already has its own entry point up top (the
+// chip in row 1). Notifications lives as its own ring icon next to the
+// profile chip instead of a nav tab.
+const NAV_TABS_PUBLIC = [
   { label: 'HOME', to: '/' },
   { label: 'ROOMS', to: '/rooms' },
+  { label: 'ABOUT US', to: '/about' },
+] as const;
+
+// No HOME tab here — "/" redirects a signed-in visitor straight to Rooms
+// (see app/router.tsx's HomeOrRedirect), so a HOME link would just bounce
+// back to the same page it's sitting on.
+const NAV_TABS_AUTHENTICATED = [
+  { label: 'ROOMS', to: '/rooms' },
+  { label: 'ABOUT US', to: '/about' },
 ] as const;
 
 function isActive(pathname: string, to: string): boolean {
@@ -52,11 +64,24 @@ export function Chrome() {
               to="/notifications"
               aria-label="Notifications"
               title="Notifications"
-              className={`w-9 h-9 flex items-center justify-center border transition-colors duration-200 hover:border-bone ${
+              className={`zone-ring w-9 h-9 flex-shrink-0 flex items-center justify-center border transition-colors duration-200 hover:border-bone ${
                 pathname === '/notifications' ? 'border-zone' : 'border-lichen'
               }`}
             >
-              <span className="w-2.5 h-2.5 bg-zone" />
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M8 1.5c-1.66 0-3 1.34-3 3v2.1c0 .5-.18.98-.5 1.36L3.2 9.5c-.5.58-.08 1.5.68 1.5h8.24c.76 0 1.18-.92.68-1.5l-1.3-1.54a2 2 0 0 1-.5-1.36V4.5c0-1.66-1.34-3-3-3Z"
+                  stroke={pathname === '/notifications' ? tokens.zone : tokens.lichen}
+                  strokeWidth="1.3"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M6.2 13a1.9 1.9 0 0 0 3.6 0"
+                  stroke={pathname === '/notifications' ? tokens.zone : tokens.lichen}
+                  strokeWidth="1.3"
+                  strokeLinecap="round"
+                />
+              </svg>
             </Link>
           )}
           {isAuthenticated ? (
@@ -98,8 +123,8 @@ export function Chrome() {
         </div>
       </div>
 
-      <nav className="flex border-b border-lichen px-10 overflow-x-auto">
-        {NAV_TABS.map((tab) => {
+      <nav className="flex justify-center border-b border-lichen px-10 overflow-x-auto">
+        {(isAuthenticated ? NAV_TABS_AUTHENTICATED : NAV_TABS_PUBLIC).map((tab) => {
           const active = isActive(pathname, tab.to);
           return (
             <Link

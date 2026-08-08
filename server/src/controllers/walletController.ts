@@ -69,4 +69,14 @@ export const walletController = {
     const wallet = await walletService.devFaucet(user.id, req.body.amount);
     res.json({ wallet });
   },
+
+  async getDepositInfo(_req: Request, res: Response) {
+    res.json(walletService.getDepositInfo());
+  },
+
+  async chainFaucet(req: Request, res: Response) {
+    const user = requireUser(req);
+    const result = await walletService.chainFaucet(user.id, req.body.amount);
+    res.json(result);
+  },
 };

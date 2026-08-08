@@ -98,7 +98,11 @@ export function RegisterPage() {
       </div>
 
       <div className="relative min-h-[420px] overflow-hidden border-l border-lichen">
-        <img src={authHeroSrc} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <img
+          src={authHeroSrc}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: 'linear-gradient(180deg, rgba(23,19,16,0.25) 0%, rgba(23,19,16,0.7) 100%)' }}

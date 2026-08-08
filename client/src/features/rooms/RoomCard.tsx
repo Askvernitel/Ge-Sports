@@ -10,6 +10,13 @@ import { tokens } from '@/lib/tokens';
 export function RoomCard({ room }: { room: Room }) {
   const countdown = useCountdown(room.lockAt, LOCK_WINDOW_MS);
   const ringColor = zoneRingColor(countdown.pct);
+  // A room that's still 'open' hasn't actually locked yet, regardless of
+  // what the countdown display says — lockAt is only ever set once the
+  // creator hits Start (see server/src/services/roomService.ts's `start`).
+  // Showing "00:00" in flare for a room nobody has started yet reads as
+  // locked/unjoinable when it's still perfectly joinable, so treat that
+  // combination as "waiting to start" rather than "expired".
+  const waitingToStart = room.status === 'open' && countdown.expired;
 
   const statusLabel = room.isLive ? 'LIVE' : room.joinedByMe ? 'JOINED' : 'OPEN';
   const statusColor = room.isLive ? tokens.flare : room.joinedByMe ? tokens.zone : tokens.lichen;
@@ -53,12 +60,14 @@ export function RoomCard({ room }: { room: Room }) {
           </span>
         </div>
         <div className="flex justify-between items-center font-mono text-sm">
-          <span className="text-lichen">{room.isLive ? 'Alive' : 'Locks in'}</span>
+          <span className="text-lichen">{room.isLive ? 'Alive' : waitingToStart ? 'Status' : 'Locks in'}</span>
           <span className="flex items-center gap-2.5">
             {room.isLive ? (
               <span className="tabular-nums" style={{ color: tokens.flare }}>
                 {room.alivePlayers}
               </span>
+            ) : waitingToStart ? (
+              <span style={{ color: tokens.zone }}>Waiting to start</span>
             ) : (
               <>
                 <ZoneRing pct={countdown.pct} size={20} />

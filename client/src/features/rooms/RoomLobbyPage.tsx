@@ -4,7 +4,7 @@ import { useRoom, useRoomParticipants } from '@/hooks/useRoom';
 import { useSocketRoom } from '@/hooks/useSocketRoom';
 import { useCountdown } from '@/hooks/useCountdown';
 import { ZoneRing } from '@/components/ZoneRing';
-import { lobbyTerrainSrc } from '@/lib/mapAssets';
+import { mapImageFor } from '@/lib/mapAssets';
 import { computeRake, computeDistributable, formatTokens } from '@/lib/money';
 import { friendlyErrorMessage } from '@/lib/errorCopy';
 import { tokens } from '@/lib/tokens';
@@ -23,6 +23,11 @@ export function RoomLobbyPage() {
   useSocketRoom(roomId);
 
   const countdown = useCountdown(room?.lockAt ?? new Date().toISOString(), LOCK_WINDOW_MS);
+  // See RoomCard.tsx for why: lockAt is only real once the room is actually
+  // started, so an 'open' room showing an "expired" countdown just hasn't
+  // started yet — it's still fully joinable, and the display shouldn't
+  // suggest otherwise.
+  const waitingToStart = room?.status === 'open' && countdown.expired;
 
   const leaveMutation = useMutation({
     mutationFn: () => leaveRoom(roomId as string),
@@ -56,7 +61,7 @@ export function RoomLobbyPage() {
         <div className="relative overflow-hidden border-r-0 lg:border-r border-b lg:border-b-0 border-lichen flex items-center justify-center" style={{ minHeight: 400 }}>
           <Skeleton className="w-[220px] h-[220px] zone-ring" />
         </div>
-        <div className="p-8">
+        <div className="p-10">
           <Skeleton className="h-4 w-1/2 mb-4" />
           <Skeleton className="h-10 w-full mb-2.5" />
           <Skeleton className="h-10 w-full mb-6" />
@@ -90,7 +95,7 @@ export function RoomLobbyPage() {
     <div className="grid grid-cols-1 lg:[grid-template-columns:1fr_380px]">
       <div className="relative overflow-hidden border-r-0 lg:border-r border-b lg:border-b-0 border-lichen" style={{ minHeight: 400 }}>
         <img
-          src={lobbyTerrainSrc}
+          src={mapImageFor(room.config.map)}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: 0.6 }}
@@ -102,17 +107,18 @@ export function RoomLobbyPage() {
           }}
         />
         <div className="relative flex flex-col items-center justify-center py-10" style={{ minHeight: 400 }}>
-          <ZoneRing pct={countdown.pct} size={220} discSize={186}>
+          <ZoneRing pct={waitingToStart ? 0 : countdown.pct} size={220} discSize={186}>
             <span className="font-display font-black text-[40px] tracking-[1px]">{room.code}</span>
-            <span className="font-mono text-md text-zone mt-1">{countdown.label}</span>
+            <span className="font-mono text-md text-zone mt-1">{waitingToStart ? 'OPEN' : countdown.label}</span>
           </ZoneRing>
           <span className="font-mono text-sm tracking-[1px] text-lichen mt-4">
-            {room.config.mode.toUpperCase()} · {room.config.map.toUpperCase()} · LOCKS IN {countdown.label}
+            {room.config.mode.toUpperCase()} · {room.config.map.toUpperCase()} ·{' '}
+            {waitingToStart ? 'WAITING TO START' : `LOCKS IN ${countdown.label}`}
           </span>
         </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-10">
         <div className="font-display font-bold text-sm tracking-[2px] uppercase text-lichen mb-4">
           Participants — {entries}/{room.config.maxPlayers}
         </div>

@@ -10,6 +10,7 @@ import { DepositWithdrawPage } from '@/features/wallet/DepositWithdrawPage';
 import { MatchResultPage } from '@/features/match/MatchResultPage';
 import { IdentityVerificationPage } from '@/features/kyc/IdentityVerificationPage';
 import { NotificationsPage } from '@/features/notifications/NotificationsPage';
+import { AboutPage } from '@/features/about/AboutPage';
 import { useSessionStore } from '@/app/store';
 
 // Wallet/profile/verify need a real JWT (their backend routes are behind
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '/', element: <HomeOrRedirect /> },
+      { path: '/about', element: <AboutPage /> },
       { path: '/rooms', element: <RoomsPage /> },
       { path: '/rooms/:roomId', element: <RoomLobbyPage /> },
       { path: '/matches/:matchId', element: <MatchResultPage /> },

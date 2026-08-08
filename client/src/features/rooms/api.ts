@@ -88,8 +88,9 @@ function mapRoom(r: BackendRoom): Room {
 }
 
 export async function fetchRooms(filters: Partial<RoomFilters> = {}): Promise<Room[]> {
+  // Region is intentionally not sent — the UI no longer divides rooms by
+  // region, though the backend and Room model still carry config.region.
   const params = new URLSearchParams();
-  if (filters.region) params.set('region', filters.region);
   if (filters.modes && filters.modes.length === 1) params.set('mode', filters.modes[0]!);
   if (typeof filters.feeMin === 'number') params.set('minFee', String(filters.feeMin));
   if (typeof filters.feeMax === 'number') params.set('maxFee', String(filters.feeMax));
@@ -173,7 +174,6 @@ export async function createRoom(input: CreateRoomInput): Promise<Room> {
   return mapRoom(room);
 }
 
-export const REGIONS: Region[] = ['EU', 'NA', 'SA', 'AS', 'OCE'];
 export const MODES: Room['config']['mode'][] = ['solo', 'duo', 'squad'];
 
 /** Rooms the current user has an active entry in — used on the Profile screen. */

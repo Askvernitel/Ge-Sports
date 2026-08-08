@@ -17,3 +17,4 @@ function devOnlyGate(_req: Request, _res: Response, next: NextFunction): void {
 }
 
 devRoutes.post('/faucet', devOnlyGate, requireAuth, validateBody(devFaucetSchema), asyncHandler(walletController.devFaucet));
+devRoutes.post('/chain-faucet', devOnlyGate, requireAuth, validateBody(devFaucetSchema), asyncHandler(walletController.chainFaucet));

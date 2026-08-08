@@ -6,9 +6,11 @@ import { walletRepo } from '../repositories/walletRepo.js';
 import { ledgerRepo } from '../repositories/ledgerRepo.js';
 import { onchainTxRepo } from '../repositories/onchainTxRepo.js';
 import { withdrawalRepo } from '../repositories/withdrawalRepo.js';
+import { PublicKey } from '@solana/web3.js';
 import { verifyWalletOwnership } from '../chain/signatureVerify.js';
 import { verifyDepositTransaction } from '../chain/txVerify.js';
 import { getTreasuryKeypair } from '../chain/treasury.js';
+import { buildTreasuryTransferTx, sendRawAndConfirm } from '../chain/splTransfer.js';
 import {
   decimal128ToMinorUnits,
   minorUnitsToDecimal128,
@@ -239,5 +241,47 @@ export const walletService = {
       await session.endSession();
     }
     return walletRepo.findByUserId(userId);
+  },
+
+  /** Treasury public key + mint address, so the client knows where to send
+   * a real on-chain deposit. Null fields mean chain features aren't
+   * configured yet (no funded treasury / no mint) rather than an error —
+   * the frontend degrades to the off-chain faucet in that case. */
+  getDepositInfo() {
+    const treasury = getTreasuryKeypair();
+    return {
+      treasuryPublicKey: treasury ? treasury.publicKey.toBase58() : null,
+      mint: env.SOLANA_TOKEN_MINT || null,
+    };
+  },
+
+  /**
+   * Dev-only: sends REAL on-chain GESPORTS tokens from the treasury to the
+   * caller's own linked wallet, so there's something to test the real
+   * deposit-claim flow with. Distinct from devFaucet, which only credits
+   * the off-chain custodial ledger and never touches the chain.
+   */
+  async chainFaucet(userId: string, amount: string) {
+    if (env.NODE_ENV === 'production' || !env.FEATURE_DEV_FAUCET) {
+      throw new AppError('FORBIDDEN', 'Faucet is disabled in this environment');
+    }
+    const treasury = getTreasuryKeypair();
+    if (!treasury || !env.SOLANA_TOKEN_MINT) {
+      throw new AppError('CHAIN_ERROR', 'Treasury or token mint is not configured yet');
+    }
+    const wallet = await walletRepo.findByUserId(userId);
+    if (!wallet?.linkedPublicKey) {
+      throw new AppError('VALIDATION_ERROR', 'Connect a wallet from your profile before requesting devnet tokens');
+    }
+    const amountMinor = decimal128ToMinorUnits(amount);
+    if (amountMinor <= 0n) throw new AppError('VALIDATION_ERROR', 'Amount must be positive');
+
+    const { rawTx } = await buildTreasuryTransferTx({
+      treasury,
+      destination: new PublicKey(wallet.linkedPublicKey),
+      amountMinorUnits: amountMinor,
+    });
+    const signature = await sendRawAndConfirm(rawTx);
+    return { signature };
   },
 };

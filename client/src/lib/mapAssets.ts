@@ -1,11 +1,6 @@
 import heroField from '@/assets/maps/hero-field.jpg';
 import legendTerrain from '@/assets/maps/legend-terrain.jpg';
-// LOCAL-ONLY, not committed to git (see .gitignore) — this is an actual
-// PUBG in-game Miramar (desert) render, used here purely for local
-// development per explicit instruction that this build stays on localhost
-// and is never hosted/distributed. Do not reference this file if the app is
-// ever deployed publicly — swap back to a licensed/original image first.
-import authHero from '@/assets/maps/auth-hero-local.avif';
+import authHero from '@/assets/maps/auth-hero.jpg';
 import mapErangel from '@/assets/maps/map-erangel.jpg';
 import mapMiramar from '@/assets/maps/map-miramar.jpg';
 import mapSanhok from '@/assets/maps/map-sanhok.jpg';
@@ -24,8 +19,10 @@ export const heroTerrainSrc = heroField;
 // sector patterns by Bernd Dittrich, https://unsplash.com/photos/ZqikUPAU68c)
 // for the Rooms page legend rail's "EU sector" map thumbnail.
 export const legendTerrainSrc = legendTerrain;
-// Sign-in/sign-up side panel — see the import comment above for the
-// local-only caveat.
+// Public domain (US Department of Energy work product, official duties —
+// https://commons.wikimedia.org/wiki/File:Castle_Bravo_Blast.jpg) — the
+// Castle Bravo thermonuclear test, Bikini Atoll, 1 March 1954. Sign-in/
+// sign-up side panel.
 export const authHeroSrc = authHero;
 
 export const mapImages: Record<Exclude<RoomMap, 'any'>, string> = {

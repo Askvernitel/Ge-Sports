@@ -66,30 +66,29 @@ export function NotificationsPage() {
 
   return (
     <div>
-      <div className="px-10 pt-12 pb-8 border-b border-lichen">
+      <div className="px-5 sm:px-10 pt-12 pb-8 border-b border-lichen">
         <h1 className="font-display font-black text-5xl tracking-[1px] uppercase leading-none">Notifications</h1>
         <div className="text-md text-lichen mt-2">Escrow, settlement, and wallet events for your account.</div>
       </div>
 
-      <div className="px-10 pt-8 pb-[72px]" style={{ maxWidth: 820 }}>
+      <div className="px-5 sm:px-10 pt-8 pb-[72px]" style={{ maxWidth: 820 }}>
         {isLoading && Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-[52px] w-full mb-0.5" />)}
         {!isLoading && feed.length === 0 && <div className="text-lichen text-md">No notifications yet.</div>}
         {!isLoading &&
           feed.map((item) => (
             <div
               key={item.id}
-              className="grid items-center gap-3 px-5 py-3.5 bg-panel mb-0.5"
-              style={{ gridTemplateColumns: 'minmax(90px,150px) minmax(0,1fr) 90px 100px' }}
+              className="grid grid-cols-2 gap-x-3 gap-y-1 sm:gap-3 sm:items-center px-5 py-3.5 bg-panel mb-0.5 sm:[grid-template-columns:minmax(90px,150px)_minmax(0,1fr)_90px_100px]"
             >
-              <span className="font-mono text-sm text-lichen">{item.time}</span>
-              <span className="text-base">{item.description}</span>
+              <span className="font-mono text-sm text-lichen order-1">{item.time}</span>
+              <span className="text-base col-span-2 sm:col-span-1 order-3 sm:order-2">{item.description}</span>
               <span
-                className="font-mono text-base tabular-nums"
+                className="font-mono text-base tabular-nums text-right sm:text-left order-4 sm:order-3"
                 style={{ color: item.status === 'ESCROWED' ? tokens.zone : tokens.bone }}
               >
                 {item.amount === null ? '' : formatSigned(item.amount)}
               </span>
-              <span className="font-mono text-xs text-lichen">{item.status}</span>
+              <span className="font-mono text-xs text-lichen text-right sm:text-left order-2 sm:order-4">{item.status}</span>
             </div>
           ))}
       </div>

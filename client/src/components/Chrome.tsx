@@ -125,7 +125,7 @@ export function Chrome() {
         </div>
       </div>
 
-      <nav className="flex justify-center border-b border-lichen px-10 overflow-x-auto">
+      <nav className="flex justify-center border-b border-lichen px-4 sm:px-10 overflow-x-auto">
         {(isAuthenticated ? NAV_TABS_AUTHENTICATED : NAV_TABS_PUBLIC).map((tab) => {
           const active = isActive(pathname, tab.to);
           return (

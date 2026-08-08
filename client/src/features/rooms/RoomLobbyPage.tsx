@@ -61,7 +61,7 @@ export function RoomLobbyPage() {
         <div className="relative overflow-hidden border-r-0 lg:border-r border-b lg:border-b-0 border-lichen flex items-center justify-center" style={{ minHeight: 400 }}>
           <Skeleton className="w-[220px] h-[220px] zone-ring" />
         </div>
-        <div className="p-10">
+        <div className="p-5 sm:p-10">
           <Skeleton className="h-4 w-1/2 mb-4" />
           <Skeleton className="h-10 w-full mb-2.5" />
           <Skeleton className="h-10 w-full mb-6" />
@@ -73,7 +73,7 @@ export function RoomLobbyPage() {
 
   if (!room) {
     return (
-      <div className="px-10 py-16 text-center">
+      <div className="px-5 sm:px-10 py-16 text-center">
         <div className="font-display font-bold text-2xl uppercase mb-3">Room not found</div>
         <p className="text-lichen text-md mb-6">
           This room doesn&apos;t exist, or it's no longer open.
@@ -118,7 +118,7 @@ export function RoomLobbyPage() {
         </div>
       </div>
 
-      <div className="p-10">
+      <div className="p-5 sm:p-10">
         <div className="font-display font-bold text-sm tracking-[2px] uppercase text-lichen mb-4">
           Participants — {entries}/{room.config.maxPlayers}
         </div>

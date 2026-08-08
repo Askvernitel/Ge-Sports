@@ -20,7 +20,7 @@ export function IdentityVerificationPage() {
   });
 
   return (
-    <div className="mx-auto px-10 pt-8 pb-16" style={{ maxWidth: 640 }}>
+    <div className="mx-auto px-5 sm:px-10 pt-8 pb-16" style={{ maxWidth: 640 }}>
       <div className="pb-2">
         <h1 className="font-display font-black text-5xl tracking-[1px] uppercase leading-none">
           Identity verification

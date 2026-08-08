@@ -1,6 +1,6 @@
 export function AboutPage() {
   return (
-    <div className="px-10 pt-12 pb-16" style={{ maxWidth: 760 }}>
+    <div className="px-5 sm:px-10 pt-12 pb-16" style={{ maxWidth: 760 }}>
       <h1 className="font-display font-black text-5xl tracking-[1px] uppercase leading-none mb-6">About</h1>
 
       <p className="text-md leading-[1.6] mb-6">

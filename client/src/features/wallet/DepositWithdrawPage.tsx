@@ -107,12 +107,12 @@ export function DepositWithdrawPage() {
 
   return (
     <div>
-      <div className="px-10 pt-8 pb-2">
+      <div className="px-5 sm:px-10 pt-8 pb-2">
         <h1 className="font-display font-black text-5xl tracking-[1px] uppercase leading-none">Deposit / withdraw</h1>
       </div>
 
       <div
-        className="grid grid-cols-1 sm:[grid-template-columns:1fr_1fr] gap-6 px-10 py-6 box-border"
+        className="grid grid-cols-1 sm:[grid-template-columns:1fr_1fr] gap-6 px-5 sm:px-10 py-6 box-border"
         style={{ maxWidth: 820 }}
       >
         <div className="border border-lichen bg-panel p-8">

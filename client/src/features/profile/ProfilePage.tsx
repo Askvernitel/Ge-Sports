@@ -94,16 +94,16 @@ export function ProfilePage() {
   return (
     <div>
       {/* Identity header */}
-      <div className="flex flex-wrap items-end justify-between gap-6 px-10 pt-12 pb-8 border-b border-lichen">
-        <div className="flex items-center gap-6">
-          <div className="w-[72px] h-[72px] bg-zone text-ground font-display font-black text-3xl flex items-center justify-center">
+      <div className="flex flex-wrap items-end justify-between gap-6 px-5 sm:px-10 pt-12 pb-8 border-b border-lichen">
+        <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+          <div className="w-[56px] h-[56px] sm:w-[72px] sm:h-[72px] bg-zone text-ground font-display font-black text-2xl sm:text-3xl flex items-center justify-center flex-shrink-0">
             {initials}
           </div>
-          <div>
-            <div className="font-display font-black text-5xl tracking-[1px] uppercase leading-none">
+          <div className="min-w-0">
+            <div className="font-display font-black text-3xl sm:text-5xl tracking-[1px] uppercase leading-none break-words">
               {displayName}
             </div>
-            <div className="font-mono text-sm text-lichen mt-2">
+            <div className="font-mono text-sm text-lichen mt-2 break-words">
               {pubgNameLinked ? 'PUBG NAME LINKED' : 'PUBG NAME NOT LINKED'} · {publicKey ?? 'WALLET NOT CONNECTED'}
             </div>
           </div>
@@ -130,7 +130,7 @@ export function ProfilePage() {
 
       {/* Wallet connect + PUBG name link — required before joining a room,
           kept off the sign-up/sign-in flow on purpose. */}
-      <div className="flex flex-wrap gap-6 px-10 pt-8">
+      <div className="flex flex-wrap gap-6 px-5 sm:px-10 pt-8">
         <div className="border border-lichen bg-panel p-6" style={{ flex: '1 1 320px' }}>
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -217,7 +217,7 @@ export function ProfilePage() {
       </div>
 
       {/* Your rooms */}
-      <div className="px-10 pt-4">
+      <div className="px-5 sm:px-10 pt-4">
         <div className="font-display font-bold text-md tracking-[2px] uppercase mb-5">Your rooms</div>
         <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px,1fr))' }}>
           {roomsLoading &&
@@ -283,7 +283,7 @@ export function ProfilePage() {
       </div>
 
       {/* Recent activity */}
-      <div className="px-10 pt-14 pb-[72px]">
+      <div className="px-5 sm:px-10 pt-14 pb-[72px]">
         <div className="font-display font-bold text-md tracking-[2px] uppercase mb-5">Recent activity</div>
         {ledgerLoading &&
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[52px] w-full mb-0.5" />)}
@@ -291,18 +291,17 @@ export function ProfilePage() {
         {(ledger ?? []).map((entry) => (
           <div
             key={entry.id}
-            className="grid items-center gap-3 px-5 py-3.5 bg-panel mb-0.5"
-            style={{ gridTemplateColumns: 'minmax(90px,120px) minmax(0,1fr) 90px 100px' }}
+            className="grid grid-cols-2 gap-x-3 gap-y-1 sm:gap-3 sm:items-center px-5 py-3.5 bg-panel mb-0.5 sm:[grid-template-columns:minmax(90px,120px)_minmax(0,1fr)_90px_100px]"
           >
-            <span className="font-mono text-sm text-lichen">{entry.createdAt}</span>
-            <span className="text-base">{entry.description}</span>
+            <span className="font-mono text-sm text-lichen order-1">{entry.createdAt}</span>
+            <span className="text-base col-span-2 sm:col-span-1 order-3 sm:order-2">{entry.description}</span>
             <span
-              className="font-mono text-base tabular-nums"
+              className="font-mono text-base tabular-nums text-right sm:text-left order-4 sm:order-3"
               style={{ color: entry.status === 'ESCROWED' ? tokens.zone : tokens.bone }}
             >
               {formatSigned(entry.amount)}
             </span>
-            <span className="font-mono text-xs text-lichen">{entry.status}</span>
+            <span className="font-mono text-xs text-lichen text-right sm:text-left order-2 sm:order-4">{entry.status}</span>
           </div>
         ))}
       </div>

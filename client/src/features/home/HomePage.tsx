@@ -40,7 +40,7 @@ export function HomePage() {
               'linear-gradient(90deg, rgba(23,19,16,0.95) 0%, rgba(23,19,16,0.7) 50%, rgba(23,19,16,0.2) 100%)',
           }}
         />
-        <div className="relative px-10 pt-20 pb-14 max-w-[680px]">
+        <div className="relative px-5 sm:px-10 pt-20 pb-14 max-w-[680px]">
           <div className="font-mono text-sm tracking-[2px] text-lichen mb-5">SOLANA DEVNET · TEST TOKENS</div>
           <h1
             className="font-display font-black leading-[0.92] tracking-[1px] uppercase"
@@ -86,7 +86,7 @@ export function HomePage() {
 
       {/* Live now — placed right after the hero as the immediate hook,
           rather than buried below the explainer rows. */}
-      <div className="px-10 pt-16 pb-[72px]">
+      <div className="px-5 sm:px-10 pt-16 pb-[72px]">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-2 bg-flare" />
           <span className="font-display font-bold text-md tracking-[2px] uppercase">Live now</span>
@@ -134,7 +134,7 @@ export function HomePage() {
       </div>
 
       {/* Three ruled rows — no numbering, this is not a sequence */}
-      <div className="px-10 py-16 border-t border-lichen">
+      <div className="px-5 sm:px-10 py-16 border-t border-lichen">
         {STEPS.map((step) => (
           <div
             key={step.title}

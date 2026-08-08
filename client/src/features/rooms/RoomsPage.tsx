@@ -62,14 +62,14 @@ export function RoomsPage() {
 
   return (
     <div>
-      <div className="px-10 pt-12 pb-2">
+      <div className="px-5 sm:px-10 pt-12 pb-2">
         <h1 className="font-display font-black text-6xl tracking-[1px] uppercase leading-none">Rooms</h1>
         <div className="text-md text-lichen mt-2">
           {openCount} open · {liveCount} live
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-10 px-10 pt-8 pb-[72px] items-start">
+      <div className="flex flex-wrap gap-10 px-5 sm:px-10 pt-8 pb-[72px] items-start">
         {/* Legend rail */}
         <div className="border border-lichen bg-panel p-7 box-border" style={{ flex: '0 1 260px' }}>
           <div className="font-display font-bold text-sm tracking-[2px] uppercase text-lichen mb-5">Legend</div>
